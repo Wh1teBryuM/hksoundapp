@@ -25,30 +25,32 @@ export default function SettingsScreen() {
     await saveSettings(updated);
   }
 
-  function SettingRow({
-    label,
-    description,
-    settingKey,
-  }: {
-    label: string;
-    description: string;
-    settingKey: keyof Settings;
-  }) {
-    return (
-      <View style={styles.row}>
-        <View style={styles.rowText}>
-          <Text style={styles.rowLabel}>{label}</Text>
-          <Text style={styles.rowDescription}>{description}</Text>
-        </View>
-        <Switch
-          value={settings[settingKey] as boolean}
-          onValueChange={(val) => updateSetting(settingKey, val)}
-          trackColor={{ false: '#333', true: '#C8FF00' }}
-          thumbColor={settings[settingKey] ? '#000' : '#888'}
-        />
-      </View>
-    );
-  }
+        function SettingRow({
+        label,
+        description,
+        value,
+        onChange,
+        }: {
+        label: string;
+        description: string;
+        value: boolean;
+        onChange: (val: boolean) => void;
+        }) {
+        return (
+            <View style={styles.row}>
+            <View style={styles.rowText}>
+                <Text style={styles.rowLabel}>{label}</Text>
+                <Text style={styles.rowDescription}>{description}</Text>
+            </View>
+            <Switch
+                value={value}
+                onValueChange={onChange}
+                trackColor={{ false: '#333', true: '#C8FF00' }}
+                thumbColor={value ? '#000' : '#888'}
+            />
+            </View>
+        );
+        }
 
   return (
     <View style={styles.container}>
@@ -66,18 +68,20 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>SETTINGS</Text>
 
         <View style={styles.card}>
-          <SettingRow
-            label="Show English Labels"
-            description="Display English translation below Chinese label"
-            settingKey="showEnglishLabel"
-          />
-          <View style={styles.divider} />
-          <SettingRow
-            label="Stop on Second Tap"
-            description="Tap a playing sound again to stop it"
-            settingKey="stopOnSecondTap"
-          />
-        </View>
+            <SettingRow
+                label="Show English Labels"
+                description="Display English translation below Chinese label"
+                value={settings.showEnglishLabel}
+                onChange={(val) => updateSetting('showEnglishLabel', val)}
+            />
+            <View style={styles.divider} />
+            <SettingRow
+                label="Stop on Second Tap"
+                description="Tap a playing sound again to stop it"
+                value={settings.stopOnSecondTap}
+                onChange={(val) => updateSetting('stopOnSecondTap', val)}
+            />
+            </View>
       </ScrollView>
     </View>
   );
