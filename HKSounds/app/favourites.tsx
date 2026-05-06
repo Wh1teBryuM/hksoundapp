@@ -118,6 +118,7 @@ export default function FavouritesScreen() {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
+        
       </View>
       <View style={styles.headerUnderline} />
 
@@ -173,10 +174,13 @@ const CYAN = '#00E5FF';
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d0d0d' },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingTop: 52,
-    paddingBottom: 12,
+    paddingTop: 80,
+    paddingBottom: 25,
+    position: 'relative',
   },
   headerTitle: {
     fontSize: 26,

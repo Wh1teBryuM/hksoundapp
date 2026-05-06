@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingTop: 52,
-    paddingBottom: 12,
+    paddingTop: 80,
+    paddingBottom: 25,
     position: 'relative',
   },
   headerTitle: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   addBtn: {
     position: 'absolute',
     right: 20,
-    top: 50,
+    bottom: 25,
     width: 36,
     height: 36,
     borderRadius: 18,
