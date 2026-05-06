@@ -22,7 +22,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {visibleRoutes.map((route: any) => {
         const { options } = descriptors[route.key];
         const label = options.title || route.name;
-        const isFocused = state.routes[state.index].name === route.name;
+        const isFocused = state.index === state.routes.findIndex((r: any) => r.name === route.name);
 
         return (
           <TouchableOpacity
