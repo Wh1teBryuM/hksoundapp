@@ -1,5 +1,6 @@
 import { Audio } from 'expo-av';
-import { useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import {
   FlatList,
   ScrollView,
@@ -9,31 +10,32 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SOUNDS, Sound, CATEGORIES, SoundCategory } from '../constants/sounds';
-import { getFavourites, saveFavourites, getSettings, Settings, DEFAULT_SETTINGS } from '../utils/storage';
-import { useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { CATEGORIES } from '../constants/sounds';
+import { DynamicSound, SoundCategory, loadSounds } from '../utils/soundStorage';
+import { getFavourites, getSettings, saveFavourites, Settings, DEFAULT_SETTINGS } from '../utils/storage';
 
 export default function FavouritesScreen() {
   const [favourites, setFavourites] = useState<string[]>([]);
-  const [activeCategory, setActiveCategory] = useState<SoundCategory>('all');
+  const [activeCategory, setActiveCategory] = useState<SoundCategory | 'all'>('all');
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [sounds, setSounds] = useState<DynamicSound[]>([]);
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useFocusEffect(
     useCallback(() => {
+      loadSounds().then(setSounds);
       getFavourites().then(setFavourites);
       getSettings().then(setSettings);
     }, [])
   );
 
-  const favSounds = SOUNDS.filter(s => favourites.includes(s.id));
+  const favSounds = sounds.filter(s => favourites.includes(s.id));
   const filteredSounds = activeCategory === 'all'
     ? favSounds
     : favSounds.filter(s => s.category === activeCategory);
 
-  async function playSound(sound: Sound) {
+  async function playSound(sound: DynamicSound) {
     try {
       if (playingId === sound.id) {
         if (settings.stopOnSecondTap) {
@@ -50,7 +52,7 @@ export default function FavouritesScreen() {
         soundRef.current = null;
       }
       setPlayingId(sound.id);
-      const { sound: av } = await Audio.Sound.createAsync(sound.file);
+      const { sound: av } = await Audio.Sound.createAsync({ uri: sound.filePath });
       soundRef.current = av;
       await av.playAsync();
       av.setOnPlaybackStatusUpdate((status) => {
@@ -70,7 +72,7 @@ export default function FavouritesScreen() {
     await saveFavourites(updated);
   }
 
-  function renderCard({ item, index }: { item: Sound; index: number }) {
+  function renderCard({ item, index }: { item: DynamicSound; index: number }) {
     const isPlaying = playingId === item.id;
     const useCyan = index % 4 === 2 || index % 4 === 3;
 
@@ -83,25 +85,29 @@ export default function FavouritesScreen() {
         onPress={() => playSound(item)}
         activeOpacity={0.85}
       >
-        <Text style={styles.cardEmoji}>{item.emoji}</Text>
-        <TouchableOpacity
-          style={styles.starBtn}
-          onPress={() => toggleFavourite(item.id)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.starActive}>★</Text>
-        </TouchableOpacity>
-        <Text style={styles.cardLabel}>{item.label}</Text>
-        {settings.showEnglishLabel && item.labelEn ? (
-          <Text style={styles.cardLabelEn}>{item.labelEn}</Text>
-        ) : null}
-        {isPlaying && (
-          <View style={styles.audioBars}>
-            {[1, 2, 3, 4].map(i => (
-              <View key={i} style={styles.audioBar} />
-            ))}
-          </View>
-        )}
+        <View style={styles.cardTop}>
+          <Text style={styles.cardEmoji}>{item.emoji}</Text>
+          <TouchableOpacity
+            style={styles.starBtn}
+            onPress={() => toggleFavourite(item.id)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.starActive}>★</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.cardBottom}>
+          <Text style={styles.cardLabel}>{item.label}</Text>
+          {settings.showEnglishLabel && item.labelEn ? (
+            <Text style={styles.cardLabelEn}>{item.labelEn}</Text>
+          ) : null}
+          {isPlaying && (
+            <View style={styles.audioBars}>
+              {[1, 2, 3, 4].map(i => (
+                <View key={i} style={styles.audioBar} />
+              ))}
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
     );
   }
@@ -110,13 +116,11 @@ export default function FavouritesScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
-      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        </View>
+      </View>
       <View style={styles.headerUnderline} />
 
-      {/* CATEGORY TABS */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -136,7 +140,6 @@ export default function FavouritesScreen() {
         ))}
       </ScrollView>
 
-      {/* EMPTY STATE */}
       {favSounds.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View style={styles.emptyCard}>
@@ -145,7 +148,7 @@ export default function FavouritesScreen() {
             </View>
             <Text style={styles.emptyTitle}>空列表</Text>
             <Text style={styles.emptySubtitle}>
-              未有最愛！撳任何聲音嘅星星將佢加入呢度 ✨
+              未有最愛！撳任何聲音嘅星星將佢加入呢度。✨
             </Text>
           </View>
         </View>
@@ -172,10 +175,9 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 80,
-    paddingBottom: 20,
-    },
-  headerIcon: { fontSize: 22, color: '#fff' },
+    paddingTop: 52,
+    paddingBottom: 12,
+  },
   headerTitle: {
     fontSize: 26,
     fontWeight: '900',
@@ -186,12 +188,12 @@ const styles = StyleSheet.create({
   categoryScroll: { flexGrow: 0 },
   categoryContent: {
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 12,
     gap: 8,
   },
   catPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: '#333',
@@ -227,38 +229,43 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
     marginBottom: 10,
   },
   emptySubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#888',
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 24,
   },
-  gridContent: { padding: 16, paddingTop: 4 },
-  row: { gap: 12, marginBottom: 12 },
+  gridContent: { padding: 12, paddingTop: 4 },
+  row: { gap: 10, marginBottom: 10 },
   card: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 14,
-    minHeight: 150,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 18,
+    padding: 12,
+    aspectRatio: 1,
     borderWidth: 2,
     borderColor: 'transparent',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   cardActiveLime: { borderColor: LIME },
   cardActiveCyan: { borderColor: CYAN },
-  cardEmoji: { fontSize: 44, position: 'absolute', top: 14, left: 14 },
-  starBtn: { position: 'absolute', top: 12, right: 12 },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  cardEmoji: { fontSize: 48 },
+  starBtn: { padding: 4 },
   starActive: { fontSize: 20, color: LIME },
-  cardLabel: { fontSize: 18, fontWeight: '900', color: '#fff', lineHeight: 22 },
-  cardLabelEn: { fontSize: 11, color: '#888', marginTop: 2 },
-  audioBars: { flexDirection: 'row', gap: 2, alignItems: 'flex-end', height: 16, marginTop: 6 },
+  cardBottom: {},
+  cardLabel: { fontSize: 20, fontWeight: '900', color: '#fff', lineHeight: 24 },
+  cardLabelEn: { fontSize: 11, color: '#666', marginTop: 2 },
+  audioBars: { flexDirection: 'row', gap: 2, alignItems: 'flex-end', height: 14, marginTop: 5 },
   audioBar: { width: 3, height: 10, backgroundColor: LIME, borderRadius: 2 },
 });
