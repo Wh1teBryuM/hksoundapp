@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     header: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 52,
-    paddingBottom: 12,
+    paddingTop: 80,
+    paddingBottom: 20,
     },
   headerIcon: { fontSize: 22, color: '#fff' },
   headerTitle: {
