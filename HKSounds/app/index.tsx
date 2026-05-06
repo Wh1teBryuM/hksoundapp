@@ -76,14 +76,15 @@ export default function HomeScreen() {
     const useCyan = index % 4 === 2 || index % 4 === 3;
 
     return (
-      <TouchableOpacity
-        style={[
-          styles.card,
-          isPlaying && (useCyan ? styles.cardActiveCyan : styles.cardActiveLime),
-        ]}
-        onPress={() => playSound(item)}
-        activeOpacity={0.85}
-      >
+    <TouchableOpacity
+      style={[
+        styles.card,
+        isPlaying && (useCyan ? styles.cardActiveCyan : styles.cardActiveLime),
+      ]}
+      onPress={() => playSound(item)}
+      activeOpacity={0.85}
+    >
+      <View style={styles.cardTop}>
         <Text style={styles.cardEmoji}>{item.emoji}</Text>
         <TouchableOpacity
           style={styles.starBtn}
@@ -94,6 +95,8 @@ export default function HomeScreen() {
             {isFav ? '★' : '☆'}
           </Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.cardBottom}>
         <Text style={styles.cardLabel}>{item.label}</Text>
         {settings.showEnglishLabel && item.labelEn ? (
           <Text style={styles.cardLabelEn}>{item.labelEn}</Text>
@@ -105,9 +108,10 @@ export default function HomeScreen() {
             ))}
           </View>
         )}
-      </TouchableOpacity>
-    );
-  }
+      </View>
+    </TouchableOpacity>
+  );
+}
 
   return (
     <View style={styles.container}>
@@ -182,12 +186,12 @@ const styles = StyleSheet.create({
   categoryScroll: { flexGrow: 0 },
   categoryContent: {
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 12,
     gap: 8,
   },
   catPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: '#333',
@@ -199,26 +203,32 @@ const styles = StyleSheet.create({
   },
   catPillText: { fontSize: 13, fontWeight: '700', color: '#aaa' },
   catPillTextActive: { color: '#000' },
-  gridContent: { padding: 16, paddingTop: 4 },
-  row: { gap: 12, marginBottom: 12 },
+  gridContent: { padding: 12, paddingTop: 4 },
+  row: { gap: 10, marginBottom: 10 },
   card: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 14,
-    minHeight: 150,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 18,
+    padding: 12,
+    aspectRatio: 1,
     borderWidth: 2,
     borderColor: 'transparent',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   cardActiveLime: { borderColor: LIME },
   cardActiveCyan: { borderColor: CYAN },
-  cardEmoji: { fontSize: 44, position: 'absolute', top: 14, left: 14 },
-  starBtn: { position: 'absolute', top: 12, right: 12 },
-  starIcon: { fontSize: 20, color: '#555' },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  cardEmoji: { fontSize: 48 },
+  starBtn: { padding: 4 },
+  starIcon: { fontSize: 20, color: '#444' },
   starActive: { color: LIME },
-  cardLabel: { fontSize: 18, fontWeight: '900', color: '#fff', lineHeight: 22 },
-  cardLabelEn: { fontSize: 11, color: '#888', marginTop: 2 },
-  audioBars: { flexDirection: 'row', gap: 2, alignItems: 'flex-end', height: 16, marginTop: 6 },
+  cardBottom: {},
+  cardLabel: { fontSize: 20, fontWeight: '900', color: '#fff', lineHeight: 24 },
+  cardLabelEn: { fontSize: 11, color: '#666', marginTop: 2 },
+  audioBars: { flexDirection: 'row', gap: 2, alignItems: 'flex-end', height: 14, marginTop: 5 },
   audioBar: { width: 3, height: 10, backgroundColor: LIME, borderRadius: 2 },
 });
