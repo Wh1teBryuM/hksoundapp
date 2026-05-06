@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const SOUNDS_DIR = FileSystem.documentDirectory + 'sounds/';
 const SOUNDS_JSON = FileSystem.documentDirectory + 'sounds.json';

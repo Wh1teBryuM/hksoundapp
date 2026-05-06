@@ -49,39 +49,43 @@ export default function AddSoundScreen() {
   }
 
   async function handleSave() {
-    if (!label.trim()) {
-      Alert.alert('Missing', 'Please enter a label.');
-      return;
-    }
-    if (!emoji.trim()) {
-      Alert.alert('Missing', 'Please enter an emoji.');
-      return;
-    }
-    if (!fileUri || !fileName) {
-      Alert.alert('Missing', 'Please select an MP3 file.');
-      return;
-    }
-
-    try {
-      setSaving(true);
-      const id = uuidv4();
-      const safeFileName = id + '.mp3';
-      const filePath = await copyMp3ToStorage(fileUri, safeFileName);
-      await saveSound({
-        id,
-        label: label.trim(),
-        labelEn: labelEn.trim(),
-        emoji: emoji.trim(),
-        category,
-        filePath,
-      });
-      router.back();
-    } catch {
-      Alert.alert('Error', 'Could not save sound.');
-    } finally {
-      setSaving(false);
-    }
+  if (!label.trim()) {
+    Alert.alert('Missing', 'Please enter a label.');
+    return;
   }
+  if (!emoji.trim()) {
+    Alert.alert('Missing', 'Please enter an emoji.');
+    return;
+  }
+  if (!fileUri || !fileName) {
+    Alert.alert('Missing', 'Please select an MP3 file.');
+    return;
+  }
+
+  try {
+    setSaving(true);
+    const id = uuidv4();
+    const safeFileName = id + '.mp3';
+    console.log('fileUri:', fileUri);
+    console.log('safeFileName:', safeFileName);
+    const filePath = await copyMp3ToStorage(fileUri, safeFileName);
+    console.log('filePath:', filePath);
+    await saveSound({
+      id,
+      label: label.trim(),
+      labelEn: labelEn.trim(),
+      emoji: emoji.trim(),
+      category,
+      filePath,
+    });
+    router.back();
+  } catch (e) {
+    console.error('Save error:', e);
+    Alert.alert('Error', String(e));
+  } finally {
+    setSaving(false);
+  }
+}
 
   return (
     <View style={styles.container}>
