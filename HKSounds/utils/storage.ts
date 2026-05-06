@@ -4,13 +4,11 @@ const FAVOURITES_KEY = 'hksounds_favourites';
 const SETTINGS_KEY = 'hksounds_settings';
 
 export interface Settings {
-  hapticFeedback: boolean;
   showEnglishLabel: boolean;
   stopOnSecondTap: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  hapticFeedback: true,
   showEnglishLabel: true,
   stopOnSecondTap: true,
 };

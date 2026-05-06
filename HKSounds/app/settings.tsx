@@ -67,12 +67,6 @@ export default function SettingsScreen() {
 
         <View style={styles.card}>
           <SettingRow
-            label="Haptic Feedback"
-            description="Vibrate lightly when a sound is tapped"
-            settingKey="hapticFeedback"
-          />
-          <View style={styles.divider} />
-          <SettingRow
             label="Show English Labels"
             description="Display English translation below Chinese label"
             settingKey="showEnglishLabel"
