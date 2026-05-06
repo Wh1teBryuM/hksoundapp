@@ -1,5 +1,5 @@
 import { Audio } from 'expo-av';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import {
   FlatList,
@@ -118,8 +118,13 @@ export default function FavouritesScreen() {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        
-      </View>
+        <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => router.push('/add')}
+        >
+            <Text style={styles.addBtnText}>＋</Text>
+  </TouchableOpacity>
+</View>
       <View style={styles.headerUnderline} />
 
       <ScrollView
@@ -181,7 +186,19 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 25,
     position: 'relative',
-  },
+},
+  addBtn: {
+  position: 'absolute',
+  right: 20,
+  bottom: 25,
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: LIME,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+addBtnText: { fontSize: 22, color: '#000', fontWeight: '900', lineHeight: 28 },
   headerTitle: {
     fontSize: 26,
     fontWeight: '900',

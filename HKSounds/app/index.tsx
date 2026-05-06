@@ -146,12 +146,12 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
         <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => router.push('/add')}
+            style={styles.addBtn}
+            onPress={() => router.push('/add')}
         >
-          <Text style={styles.addBtnText}>＋</Text>
+            <Text style={styles.addBtnText}>＋</Text>
         </TouchableOpacity>
-      </View>
+    </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView

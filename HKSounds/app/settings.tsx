@@ -5,9 +5,10 @@ import {
   StyleSheet,
   Switch,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { getSettings, saveSettings, Settings, DEFAULT_SETTINGS } from '../utils/storage';
 
 export default function SettingsScreen() {
@@ -25,61 +26,66 @@ export default function SettingsScreen() {
     await saveSettings(updated);
   }
 
-        function SettingRow({
-        label,
-        description,
-        value,
-        onChange,
-        }: {
-        label: string;
-        description: string;
-        value: boolean;
-        onChange: (val: boolean) => void;
-        }) {
-        return (
-            <View style={styles.row}>
-            <View style={styles.rowText}>
-                <Text style={styles.rowLabel}>{label}</Text>
-                <Text style={styles.rowDescription}>{description}</Text>
-            </View>
-            <Switch
-                value={value}
-                onValueChange={onChange}
-                trackColor={{ false: '#333', true: '#C8FF00' }}
-                thumbColor={value ? '#000' : '#888'}
-            />
-            </View>
-        );
-        }
+  function SettingRow({
+    label,
+    description,
+    value,
+    onChange,
+  }: {
+    label: string;
+    description: string;
+    value: boolean;
+    onChange: (val: boolean) => void;
+  }) {
+    return (
+      <View style={styles.row}>
+        <View style={styles.rowText}>
+          <Text style={styles.rowLabel}>{label}</Text>
+          <Text style={styles.rowDescription}>{description}</Text>
+        </View>
+        <Switch
+          value={value}
+          onValueChange={onChange}
+          trackColor={{ false: '#333', true: '#C8FF00' }}
+          thumbColor={value ? '#000' : '#888'}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
-      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => router.push('/add')}
+        >
+          <Text style={styles.addBtnText}>＋</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>SETTINGS</Text>
+        <Text style={styles.sectionTitle}>設定</Text>
 
         <View style={styles.card}>
-            <SettingRow
-                label="顯示英文標籤"
-                description="喺中文標籤下面顯示英文翻譯"
-                value={settings.showEnglishLabel}
-                onChange={(val) => updateSetting('showEnglishLabel', val)}
-            />
-            <View style={styles.divider} />
-            <SettingRow
-                label="再撳停止"
-                description="再撳一次停止播放中嘅聲音"
-                value={settings.stopOnSecondTap}
-                onChange={(val) => updateSetting('stopOnSecondTap', val)}
-            />
-            </View>
+          <SettingRow
+            label="顯示英文標籤"
+            description="喺中文標籤下面顯示英文翻譯"
+            value={settings.showEnglishLabel}
+            onChange={(val) => updateSetting('showEnglishLabel', val)}
+          />
+          <View style={styles.divider} />
+          <SettingRow
+            label="再撳停止"
+            description="再撳一次停止播放中嘅聲音"
+            value={settings.stopOnSecondTap}
+            onChange={(val) => updateSetting('stopOnSecondTap', val)}
+          />
+        </View>
       </ScrollView>
     </View>
   );
@@ -90,18 +96,32 @@ const LIME = '#C8FF00';
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d0d0d' },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingTop: 80,
-    paddingBottom: 20,
-    },
-  headerIcon: { fontSize: 22, color: '#fff' },
+    paddingBottom: 25,
+    position: 'relative',
+  },
   headerTitle: {
     fontSize: 26,
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
   },
+  addBtn: {
+    position: 'absolute',
+    right: 20,
+    bottom: 25,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: LIME,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addBtnText: { fontSize: 22, color: '#000', fontWeight: '900', lineHeight: 28 },
   headerUnderline: { height: 3, backgroundColor: LIME },
   content: { padding: 20 },
   sectionTitle: {
