@@ -6,11 +6,13 @@ const SETTINGS_KEY = 'hksounds_settings';
 export interface Settings {
   showEnglishLabel: boolean;
   stopOnSecondTap: boolean;
+  language: 'en' | 'zh';
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   showEnglishLabel: true,
   stopOnSecondTap: true,
+  language: 'zh',
 };
 
 export async function getFavourites(): Promise<string[]> {

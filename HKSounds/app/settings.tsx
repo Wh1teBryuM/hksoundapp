@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
+import { STRINGS } from '../constants/strings';
 import { getSettings, saveSettings, Settings, DEFAULT_SETTINGS } from '../utils/storage';
 
 export default function SettingsScreen() {
@@ -20,8 +21,16 @@ export default function SettingsScreen() {
     }, [])
   );
 
+  const S = STRINGS[settings.language];
+
   async function updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
     const updated = { ...settings, [key]: value };
+    setSettings(updated);
+    await saveSettings(updated);
+  }
+
+  async function toggleLanguage() {
+    const updated = { ...settings, language: settings.language === 'zh' ? 'en' : 'zh' } as Settings;
     setSettings(updated);
     await saveSettings(updated);
   }
@@ -58,30 +67,29 @@ export default function SettingsScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => router.push('/add')}
-        >
+        <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage}>
+          <Text style={styles.langBtnText}>{S.langToggle}</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{S.appTitle}</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={() => router.push('/add')}>
           <Text style={styles.addBtnText}>＋</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>設定</Text>
-
+        <Text style={styles.sectionTitle}>{S.settingsTitle}</Text>
         <View style={styles.card}>
           <SettingRow
-            label="顯示英文標籤"
-            description="喺中文標籤下面顯示英文翻譯"
+            label={S.showEnglishLabel}
+            description={S.showEnglishLabelDesc}
             value={settings.showEnglishLabel}
             onChange={(val) => updateSetting('showEnglishLabel', val)}
           />
           <View style={styles.divider} />
           <SettingRow
-            label="再撳停止"
-            description="再撳一次停止播放中嘅聲音"
+            label={S.stopOnSecondTap}
+            description={S.stopOnSecondTapDesc}
             value={settings.stopOnSecondTap}
             onChange={(val) => updateSetting('stopOnSecondTap', val)}
           />
@@ -109,6 +117,21 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
+  },
+  langBtn: {
+    position: 'absolute',
+    left: 20,
+    bottom: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: LIME,
+  },
+  langBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: LIME,
   },
   addBtn: {
     position: 'absolute',

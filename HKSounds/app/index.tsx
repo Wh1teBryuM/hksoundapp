@@ -12,8 +12,9 @@ import {
   View,
 } from 'react-native';
 import { CATEGORIES } from '../constants/sounds';
+import { STRINGS } from '../constants/strings';
 import { DynamicSound, SoundCategory, deleteSound, loadSounds } from '../utils/soundStorage';
-import { getFavourites, getSettings, saveFavourites, Settings, DEFAULT_SETTINGS } from '../utils/storage';
+import { DEFAULT_SETTINGS, Settings, getFavourites, getSettings, saveFavourites, saveSettings } from '../utils/storage';
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState<SoundCategory | 'all'>('all');
@@ -32,9 +33,17 @@ export default function HomeScreen() {
     }, [])
   );
 
+  const S = STRINGS[settings.language];
+
   const filteredSounds = activeCategory === 'all'
     ? sounds
     : sounds.filter(s => s.category === activeCategory);
+
+  async function toggleLanguage() {
+    const updated = { ...settings, language: settings.language === 'zh' ? 'en' : 'zh' } as Settings;
+    setSettings(updated);
+    await saveSettings(updated);
+  }
 
   async function playSound(sound: DynamicSound) {
     try {
@@ -77,18 +86,19 @@ export default function HomeScreen() {
 
   function confirmDelete(sound: DynamicSound) {
     Alert.alert(
-      '刪除聲音',
-      `確定刪除「${sound.label}」？`,
+      S.deleteTitle,
+      `${S.deleteConfirm}「${sound.label}」？`,
       [
-        { text: '取消', style: 'cancel' },
+        { text: S.cancel, style: 'cancel' },
         {
-          text: '刪除',
+          text: S.delete,
           style: 'destructive',
           onPress: async () => {
             await deleteSound(sound.id);
             setSounds(prev => prev.filter(s => s.id !== sound.id));
-            setFavourites(prev => prev.filter(f => f !== sound.id));
-            await saveFavourites(favourites.filter(f => f !== sound.id));
+            const updatedFavs = favourites.filter(f => f !== sound.id);
+            setFavourites(updatedFavs);
+            await saveFavourites(updatedFavs);
           },
         },
       ]
@@ -139,19 +149,24 @@ export default function HomeScreen() {
     );
   }
 
+  const categories = [
+    { key: 'all', label: S.all },
+    ...CATEGORIES.filter(c => c.key !== 'all'),
+  ];
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => router.push('/add')}
-        >
-            <Text style={styles.addBtnText}>＋</Text>
+        <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage}>
+          <Text style={styles.langBtnText}>{S.langToggle}</Text>
         </TouchableOpacity>
-    </View>
+        <Text style={styles.headerTitle}>{S.appTitle}</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={() => router.push('/add')}>
+          <Text style={styles.addBtnText}>＋</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView
@@ -160,11 +175,11 @@ export default function HomeScreen() {
         style={styles.categoryScroll}
         contentContainerStyle={styles.categoryContent}
       >
-        {CATEGORIES.map(cat => (
+        {categories.map(cat => (
           <TouchableOpacity
             key={cat.key}
             style={[styles.catPill, activeCategory === cat.key && styles.catPillActive]}
-            onPress={() => setActiveCategory(cat.key)}
+            onPress={() => setActiveCategory(cat.key as SoundCategory | 'all')}
           >
             <Text style={[styles.catPillText, activeCategory === cat.key && styles.catPillTextActive]}>
               {cat.label}
@@ -175,8 +190,8 @@ export default function HomeScreen() {
 
       {sounds.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>未有聲音</Text>
-          <Text style={styles.emptySubtext}>撳右上角 ＋ 新增聲音</Text>
+          <Text style={styles.emptyText}>{S.emptySound}</Text>
+          <Text style={styles.emptySubtext}>{S.emptySoundSub}</Text>
         </View>
       ) : (
         <FlatList
@@ -212,6 +227,21 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
+  },
+  langBtn: {
+    position: 'absolute',
+    left: 20,
+    bottom: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: LIME,
+  },
+  langBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: LIME,
   },
   addBtn: {
     position: 'absolute',
@@ -267,7 +297,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
     justifyContent: 'space-between',
-    },
+  },
   cardActiveLime: { borderColor: LIME },
   cardActiveCyan: { borderColor: CYAN },
   cardTop: {

@@ -1,6 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -11,7 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { STRINGS } from '../constants/strings';
 import { SoundCategory, copyMp3ToStorage, saveSound } from '../utils/soundStorage';
+import { DEFAULT_SETTINGS, Settings, getSettings, saveSettings } from '../utils/storage';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,6 +33,21 @@ export default function AddSoundScreen() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+
+  useFocusEffect(
+    useCallback(() => {
+      getSettings().then(setSettings);
+    }, [])
+  );
+
+  const S = STRINGS[settings.language];
+
+  async function toggleLanguage() {
+    const updated = { ...settings, language: settings.language === 'zh' ? 'en' : 'zh' } as Settings;
+    setSettings(updated);
+    await saveSettings(updated);
+  }
 
   async function pickFile() {
     try {
@@ -49,69 +66,66 @@ export default function AddSoundScreen() {
   }
 
   async function handleSave() {
-  if (!label.trim()) {
-    Alert.alert('Missing', 'Please enter a label.');
-    return;
-  }
-  if (!emoji.trim()) {
-    Alert.alert('Missing', 'Please enter an emoji.');
-    return;
-  }
-  if (!fileUri || !fileName) {
-    Alert.alert('Missing', 'Please select an MP3 file.');
-    return;
-  }
+    if (!label.trim()) {
+      Alert.alert('', S.missingLabel);
+      return;
+    }
+    if (!emoji.trim()) {
+      Alert.alert('', S.missingEmoji);
+      return;
+    }
+    if (!fileUri || !fileName) {
+      Alert.alert('', S.missingFile);
+      return;
+    }
 
-  try {
-    setSaving(true);
-    const id = uuidv4();
-    const safeFileName = id + '.mp3';
-    console.log('fileUri:', fileUri);
-    console.log('safeFileName:', safeFileName);
-    const filePath = await copyMp3ToStorage(fileUri, safeFileName);
-    console.log('filePath:', filePath);
-    await saveSound({
-      id,
-      label: label.trim(),
-      labelEn: labelEn.trim(),
-      emoji: emoji.trim(),
-      category,
-      filePath,
-    });
-    router.back();
-  } catch (e) {
-    console.error('Save error:', e);
-    Alert.alert('Error', String(e));
-  } finally {
-    setSaving(false);
+    try {
+      setSaving(true);
+      const id = uuidv4();
+      const safeFileName = id + '.mp3';
+      const filePath = await copyMp3ToStorage(fileUri, safeFileName);
+      await saveSound({
+        id,
+        label: label.trim(),
+        labelEn: labelEn.trim(),
+        emoji: emoji.trim(),
+        category,
+        filePath,
+      });
+      router.back();
+    } catch (e) {
+      Alert.alert('Error', S.errorSave);
+    } finally {
+      setSaving(false);
+    }
   }
-}
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>← 返回</Text>
+        <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage}>
+          <Text style={styles.langBtnText}>{S.langToggle}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>新增聲音</Text>
-        <View style={{ width: 60 }} />
+        <Text style={styles.headerTitle}>{S.appTitle}</Text>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <Text style={styles.backText}>{S.back}</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.sectionTitle}>{S.addSound}</Text>
 
-        {/* FILE PICKER */}
-        <Text style={styles.sectionLabel}>MP3 檔案</Text>
+        <Text style={styles.fieldLabel}>{S.mp3Label}</Text>
         <TouchableOpacity style={styles.filePicker} onPress={pickFile}>
           <Text style={styles.filePickerText}>
-            {fileName ? fileName : '撳此選擇 MP3 檔案'}
+            {fileName ? fileName : S.mp3Placeholder}
           </Text>
         </TouchableOpacity>
 
-        {/* LABEL */}
-        <Text style={styles.sectionLabel}>標籤（中文）</Text>
+        <Text style={styles.fieldLabel}>{S.labelZh}</Text>
         <TextInput
           style={styles.input}
           value={label}
@@ -121,8 +135,7 @@ export default function AddSoundScreen() {
           maxLength={20}
         />
 
-        {/* ENGLISH LABEL */}
-        <Text style={styles.sectionLabel}>標籤（英文，可選）</Text>
+        <Text style={styles.fieldLabel}>{S.labelEn}</Text>
         <TextInput
           style={styles.input}
           value={labelEn}
@@ -132,19 +145,17 @@ export default function AddSoundScreen() {
           maxLength={30}
         />
 
-        {/* EMOJI */}
-        <Text style={styles.sectionLabel}>Emoji</Text>
+        <Text style={styles.fieldLabel}>{S.emojiLabel}</Text>
         <TextInput
           style={styles.input}
           value={emoji}
           onChangeText={setEmoji}
-          placeholder="例如：😂"
+          placeholder="😂"
           placeholderTextColor="#444"
           maxLength={4}
         />
 
-        {/* CATEGORY */}
-        <Text style={styles.sectionLabel}>類別</Text>
+        <Text style={styles.fieldLabel}>{S.categoryLabel}</Text>
         <View style={styles.categoryGrid}>
           {CATEGORIES.map(cat => (
             <TouchableOpacity
@@ -159,17 +170,15 @@ export default function AddSoundScreen() {
           ))}
         </View>
 
-        {/* SAVE */}
         <TouchableOpacity
           style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
           onPress={handleSave}
           disabled={saving}
         >
           <Text style={styles.saveBtnText}>
-            {saving ? '儲存中...' : '儲存聲音'}
+            {saving ? S.saving : S.saveBtn}
           </Text>
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );
@@ -182,22 +191,52 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingTop: 80,
     paddingBottom: 25,
+    position: 'relative',
   },
-  backBtn: { width: 60 },
-  backText: { color: LIME, fontSize: 14, fontWeight: '700' },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
   },
+  langBtn: {
+    position: 'absolute',
+    left: 20,
+    bottom: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: LIME,
+  },
+  langBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: LIME,
+  },
+  backBtn: {
+    position: 'absolute',
+    right: 20,
+    bottom: 25,
+  },
+  backText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: LIME,
+  },
   headerUnderline: { height: 3, backgroundColor: LIME },
-  content: { padding: 20, gap: 8 },
-  sectionLabel: {
+  content: { padding: 20, paddingBottom: 40 },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#fff',
+    marginBottom: 20,
+  },
+  fieldLabel: {
     fontSize: 12,
     fontWeight: '700',
     color: '#555',

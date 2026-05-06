@@ -11,8 +11,9 @@ import {
   View,
 } from 'react-native';
 import { CATEGORIES } from '../constants/sounds';
+import { STRINGS } from '../constants/strings';
 import { DynamicSound, SoundCategory, loadSounds } from '../utils/soundStorage';
-import { getFavourites, getSettings, saveFavourites, Settings, DEFAULT_SETTINGS } from '../utils/storage';
+import { DEFAULT_SETTINGS, Settings, getFavourites, getSettings, saveFavourites, saveSettings } from '../utils/storage';
 
 export default function FavouritesScreen() {
   const [favourites, setFavourites] = useState<string[]>([]);
@@ -30,10 +31,18 @@ export default function FavouritesScreen() {
     }, [])
   );
 
+  const S = STRINGS[settings.language];
+
   const favSounds = sounds.filter(s => favourites.includes(s.id));
   const filteredSounds = activeCategory === 'all'
     ? favSounds
     : favSounds.filter(s => s.category === activeCategory);
+
+  async function toggleLanguage() {
+    const updated = { ...settings, language: settings.language === 'zh' ? 'en' : 'zh' } as Settings;
+    setSettings(updated);
+    await saveSettings(updated);
+  }
 
   async function playSound(sound: DynamicSound) {
     try {
@@ -112,19 +121,24 @@ export default function FavouritesScreen() {
     );
   }
 
+  const categories = [
+    { key: 'all', label: S.all },
+    ...CATEGORIES.filter(c => c.key !== 'all'),
+  ];
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => router.push('/add')}
-        >
-            <Text style={styles.addBtnText}>＋</Text>
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage}>
+          <Text style={styles.langBtnText}>{S.langToggle}</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{S.appTitle}</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={() => router.push('/add')}>
+          <Text style={styles.addBtnText}>＋</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerUnderline} />
 
       <ScrollView
@@ -133,11 +147,11 @@ export default function FavouritesScreen() {
         style={styles.categoryScroll}
         contentContainerStyle={styles.categoryContent}
       >
-        {CATEGORIES.map(cat => (
+        {categories.map(cat => (
           <TouchableOpacity
             key={cat.key}
             style={[styles.catPill, activeCategory === cat.key && styles.catPillActive]}
-            onPress={() => setActiveCategory(cat.key)}
+            onPress={() => setActiveCategory(cat.key as SoundCategory | 'all')}
           >
             <Text style={[styles.catPillText, activeCategory === cat.key && styles.catPillTextActive]}>
               {cat.label}
@@ -152,10 +166,8 @@ export default function FavouritesScreen() {
             <View style={styles.emptyCircle}>
               <Text style={{ fontSize: 28 }}>☆</Text>
             </View>
-            <Text style={styles.emptyTitle}>空列表</Text>
-            <Text style={styles.emptySubtitle}>
-              未有最愛！撳任何聲音嘅星星將佢加入呢度。✨
-            </Text>
+            <Text style={styles.emptyTitle}>{S.emptyFav}</Text>
+            <Text style={styles.emptySubtitle}>{S.emptyFavSub}</Text>
           </View>
         </View>
       ) : (
@@ -186,25 +198,40 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 25,
     position: 'relative',
-},
-  addBtn: {
-  position: 'absolute',
-  right: 20,
-  bottom: 25,
-  width: 36,
-  height: 36,
-  borderRadius: 18,
-  backgroundColor: LIME,
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-addBtnText: { fontSize: 22, color: '#000', fontWeight: '900', lineHeight: 28 },
+  },
   headerTitle: {
     fontSize: 26,
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
   },
+  langBtn: {
+    position: 'absolute',
+    left: 20,
+    bottom: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: LIME,
+  },
+  langBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: LIME,
+  },
+  addBtn: {
+    position: 'absolute',
+    right: 20,
+    bottom: 25,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: LIME,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addBtnText: { fontSize: 22, color: '#000', fontWeight: '900', lineHeight: 28 },
   headerUnderline: { height: 3, backgroundColor: LIME },
   categoryScroll: { flexGrow: 0 },
   categoryContent: {
