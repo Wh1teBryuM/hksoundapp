@@ -1,19 +1,53 @@
 import { Tabs } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LIME = '#C8FF00';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
+function CustomTabBar({ state, descriptors, navigation }: any) {
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={{
-      width: 48,
-      height: 34,
-      borderRadius: 12,
-      backgroundColor: focused ? LIME : 'transparent',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: 'row',
+      backgroundColor: '#0d0d0d',
+      borderTopWidth: 1.5,
+      borderTopColor: '#1f1f1f',
+      paddingBottom: insets.bottom || 12,
+      paddingTop: 8,
+      paddingHorizontal: 8,
+      gap: 8,
     }}>
-      <Text style={{ fontSize: 18 }}>{emoji}</Text>
+      {state.routes.map((route: any, index: number) => {
+        const { options } = descriptors[route.key];
+        const label = options.title || route.name;
+        const isFocused = state.index === index;
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            onPress={() => navigation.navigate(route.name)}
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: 10,
+              borderRadius: 12,
+              backgroundColor: isFocused ? LIME : 'transparent',
+            }}
+          >
+            <Text style={{
+              fontSize: 11,
+              fontWeight: '700',
+              letterSpacing: 0.5,
+              color: isFocused ? '#000' : '#555',
+              textTransform: 'uppercase',
+            }}>
+              {label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
@@ -21,47 +55,12 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 export default function RootLayout() {
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#0d0d0d',
-          borderTopColor: '#1f1f1f',
-          borderTopWidth: 1.5,
-          paddingTop: 8,
-          paddingBottom: 12,
-          height: 70,
-        },
-        tabBarActiveTintColor: '#ffffff',
-        tabBarInactiveTintColor: '#555555',
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '700',
-          letterSpacing: 0.5,
-          textTransform: 'uppercase',
-        },
-      }}
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'HOME',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🔊" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="favourites"
-        options={{
-          title: 'FAVOURITES',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="⭐" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'SETTINGS',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'HOME' }} />
+      <Tabs.Screen name="favourites" options={{ title: 'FAVOURITES' }} />
+      <Tabs.Screen name="settings" options={{ title: 'SETTINGS' }} />
     </Tabs>
   );
 }
