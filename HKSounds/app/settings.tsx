@@ -67,15 +67,15 @@ export default function SettingsScreen() {
 
         <View style={styles.card}>
             <SettingRow
-                label="Show English Labels"
-                description="Display English translation below Chinese label"
+                label="顯示英文標籤"
+                description="喺中文標籤下面顯示英文翻譯"
                 value={settings.showEnglishLabel}
                 onChange={(val) => updateSetting('showEnglishLabel', val)}
             />
             <View style={styles.divider} />
             <SettingRow
-                label="Stop on Second Tap"
-                description="Tap a playing sound again to stop it"
+                label="再撳停止"
+                description="再撳一次停止播放中嘅聲音"
                 value={settings.stopOnSecondTap}
                 onChange={(val) => updateSetting('stopOnSecondTap', val)}
             />

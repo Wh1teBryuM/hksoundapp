@@ -143,9 +143,9 @@ export default function FavouritesScreen() {
             <View style={styles.emptyCircle}>
               <Text style={{ fontSize: 28 }}>☆</Text>
             </View>
-            <Text style={styles.emptyTitle}>EMPTY LIST</Text>
+            <Text style={styles.emptyTitle}>空列表</Text>
             <Text style={styles.emptySubtitle}>
-              No favourites yet! Tap the star on any sound to add it here. ✨
+              未有最愛！撳任何聲音嘅星星將佢加入呢度 ✨
             </Text>
           </View>
         </View>
@@ -227,14 +227,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
     color: '#fff',
     letterSpacing: 1,
     marginBottom: 10,
   },
   emptySubtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#888',
     textAlign: 'center',
     lineHeight: 22,

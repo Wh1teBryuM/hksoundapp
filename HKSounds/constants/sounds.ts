@@ -10,12 +10,12 @@ export interface Sound {
 }
 
 export const CATEGORIES: { key: SoundCategory; label: string }[] = [
-  { key: 'all', label: '全部 (ALL)' },
-  { key: 'cantonese', label: '粵語 (CANTO)' },
+  { key: 'all', label: '全部' },
+  { key: 'cantonese', label: '粵語' },
   { key: 'meme', label: 'MEME' },
-  { key: 'reaction', label: 'REACTION' },
-  { key: 'movie', label: '電影 (MOVIE)' },
-  { key: 'situation', label: '情景 (SITUATION)' },
+  { key: 'reaction', label: '反應' },
+  { key: 'movie', label: '電影場景' },
+  { key: 'situation', label: '情景' },
 ];
 
 export const SOUNDS: Sound[] = [

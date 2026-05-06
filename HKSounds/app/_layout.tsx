@@ -37,7 +37,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             }}
           >
             <Text style={{
-              fontSize: 11,
+              fontSize: 15,
               fontWeight: '700',
               letterSpacing: 0.5,
               color: isFocused ? '#000' : '#555',
@@ -58,9 +58,9 @@ export default function RootLayout() {
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="index" options={{ title: 'HOME' }} />
-      <Tabs.Screen name="favourites" options={{ title: 'FAVOURITES' }} />
-      <Tabs.Screen name="settings" options={{ title: 'SETTINGS' }} />
+      <Tabs.Screen name="index" options={{ title: '主頁' }} />
+      <Tabs.Screen name="favourites" options={{ title: '我的最愛' }} />
+      <Tabs.Screen name="settings" options={{ title: '設定' }} />
     </Tabs>
   );
 }
