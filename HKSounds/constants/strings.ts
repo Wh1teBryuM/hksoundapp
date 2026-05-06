@@ -35,9 +35,9 @@ export const STRINGS = {
     missingFile: '請選擇 MP3 檔案',
     errorSave: '無法儲存聲音',
     catCantonese: '粵語',
-    catMeme: 'Meme',
+    catMeme: '迷因',
     catReaction: '反應',
-    catMovie: '電影',
+    catMovie: '電影橋段',
     catSituation: '情景',
   },
   en: {
