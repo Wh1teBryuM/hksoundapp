@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   langBtn: {
     position: 'absolute',
-    left: 20,
+    right: 20,
     bottom: 25,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -220,8 +220,8 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     position: 'absolute',
-    right: 20,
-    bottom: 25,
+    left: 20,
+    bottom: 30,
   },
   backText: {
     fontSize: 14,
