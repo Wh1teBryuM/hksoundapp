@@ -6,6 +6,7 @@ const LIME = '#C8FF00';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
+  const visibleRoutes = state.routes.filter((route: any) => route.name !== 'add');
 
   return (
     <View style={{
@@ -15,13 +16,13 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       borderTopColor: '#1f1f1f',
       paddingBottom: insets.bottom || 16,
       paddingTop: 12,
-      paddingHorizontal: 15,
+      paddingHorizontal: 8,
       gap: 8,
     }}>
-      {state.routes.map((route: any, index: number) => {
+      {visibleRoutes.map((route: any) => {
         const { options } = descriptors[route.key];
         const label = options.title || route.name;
-        const isFocused = state.index === index;
+        const isFocused = state.routes[state.index].name === route.name;
 
         return (
           <TouchableOpacity
@@ -37,10 +38,10 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             }}
           >
             <Text style={{
-              fontSize: 15,
+              fontSize: 11,
               fontWeight: '700',
               letterSpacing: 0.5,
-              color: isFocused ? '#000' : '#555',
+              color: isFocused ? '#000' : '#888',
               textTransform: 'uppercase',
             }}>
               {label}
@@ -61,6 +62,7 @@ export default function RootLayout() {
       <Tabs.Screen name="index" options={{ title: '主頁' }} />
       <Tabs.Screen name="favourites" options={{ title: '我的最愛' }} />
       <Tabs.Screen name="settings" options={{ title: '設定' }} />
+      <Tabs.Screen name="add" options={{ href: null }} />
     </Tabs>
   );
 }
