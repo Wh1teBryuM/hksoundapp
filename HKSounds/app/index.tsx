@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { CATEGORIES } from '../constants/sounds';
 import { STRINGS } from '../constants/strings';
 import { DynamicSound, SoundCategory, deleteSound, loadSounds } from '../utils/soundStorage';
 import { DEFAULT_SETTINGS, Settings, getFavourites, getSettings, saveFavourites, saveSettings } from '../utils/storage';
@@ -150,9 +149,13 @@ export default function HomeScreen() {
   }
 
   const categories = [
-    { key: 'all', label: S.all },
-    ...CATEGORIES.filter(c => c.key !== 'all'),
-  ];
+  { key: 'all', label: S.all },
+  { key: 'cantonese', label: S.catCantonese },
+  { key: 'meme', label: S.catMeme },
+  { key: 'reaction', label: S.catReaction },
+  { key: 'movie', label: S.catMovie },
+  { key: 'situation', label: S.catSituation },
+];
 
   return (
     <View style={styles.container}>

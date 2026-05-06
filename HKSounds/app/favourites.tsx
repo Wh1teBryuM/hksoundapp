@@ -122,9 +122,13 @@ export default function FavouritesScreen() {
   }
 
   const categories = [
-    { key: 'all', label: S.all },
-    ...CATEGORIES.filter(c => c.key !== 'all'),
-  ];
+  { key: 'all', label: S.all },
+  { key: 'cantonese', label: S.catCantonese },
+  { key: 'meme', label: S.catMeme },
+  { key: 'reaction', label: S.catReaction },
+  { key: 'movie', label: S.catMovie },
+  { key: 'situation', label: S.catSituation },
+];
 
   return (
     <View style={styles.container}>
