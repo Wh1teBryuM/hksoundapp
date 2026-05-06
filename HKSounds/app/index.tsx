@@ -119,10 +119,8 @@ export default function HomeScreen() {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.headerIcon}>☰</Text>
         <Text style={styles.headerTitle}>HK SOUNDS</Text>
-        <Text style={styles.headerIcon}>⚙</Text>
-      </View>
+        </View>
       <View style={styles.headerUnderline} />
 
       {/* CATEGORY TABS */}
@@ -164,14 +162,12 @@ const CYAN = '#00E5FF';
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d0d0d' },
-  header: {
-    flexDirection: 'row',
+    header: {
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 12,
-  },
+    },
   headerIcon: { fontSize: 22, color: '#fff' },
   headerTitle: {
     fontSize: 26,
