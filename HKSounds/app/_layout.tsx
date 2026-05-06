@@ -6,7 +6,7 @@ const LIME = '#C8FF00';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
-  const visibleRoutes = state.routes.filter((route: any) => route.name !== 'add');
+  const visibleRoutes = state.routes.filter((route: any) => route.name !== 'something-that-doesnt-exist');
 
   return (
     <View style={{
@@ -62,7 +62,7 @@ export default function RootLayout() {
       <Tabs.Screen name="index" options={{ title: '主頁' }} />
       <Tabs.Screen name="favourites" options={{ title: '我的最愛' }} />
       <Tabs.Screen name="settings" options={{ title: '設定' }} />
-      <Tabs.Screen name="add" options={{ href: null }} />
+      <Tabs.Screen name="add" options={{ title: '新增' }} />
     </Tabs>
   );
 }
