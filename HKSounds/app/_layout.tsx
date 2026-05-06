@@ -13,9 +13,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       backgroundColor: '#0d0d0d',
       borderTopWidth: 1.5,
       borderTopColor: '#1f1f1f',
-      paddingBottom: insets.bottom || 12,
-      paddingTop: 8,
-      paddingHorizontal: 8,
+      paddingBottom: insets.bottom || 16,
+      paddingTop: 12,
+      paddingHorizontal: 15,
       gap: 8,
     }}>
       {state.routes.map((route: any, index: number) => {
@@ -31,7 +31,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               flex: 1,
               alignItems: 'center',
               justifyContent: 'center',
-              paddingVertical: 10,
+              paddingVertical: 14,
               borderRadius: 12,
               backgroundColor: isFocused ? LIME : 'transparent',
             }}
